@@ -543,10 +543,10 @@
             .then(html => {
                 document.querySelector('.photoEdit').innerHTML = html;
 
-                // 🔥 inicializa o editor SÓ depois do HTML existir
+                //inicializa o editor SÓ depois do HTML existir
                 initEditor();
             })
-            .catch(erro => console.error('Erro aocarregar o editor: ', erro));
+            .catch(erro => console.error('Erro ao carregar o editor: ', erro));
 
         </script>
         <script src="../js/mainSettings.js"></script>

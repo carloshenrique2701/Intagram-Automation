@@ -13,6 +13,8 @@ function initEditor() {
   const resetFiltersBtn = document.querySelector('#reset-filters');
   const saveBtn = document.querySelector('#save');
 
+  const fileNameElement = document.getElementById('fileName');
+
   const defaultImageUrl =
     '../imgs/img-default.jpeg';
 
@@ -28,26 +30,12 @@ function initEditor() {
     invert: 0,
   };
 
-  //Mostra o nome do arquivo na input
-  document.getElementById('upload-image').addEventListener('change', function(e) {
+  let rotation = 0;
+  let flipY = false;
 
-    const fileNameElement = document.getElementById('fileName');
-
-      if (this.files && this.files.length > 0) {
-
-        // Mostra apenas o nome do arquivo, não o caminho completo
-        const fileName = this.files[0].name;
-        fileNameElement.textContent = fileName;
-        fileNameElement.classList.add('has-file');
-
-      } else {
-
-        fileNameElement.textContent = 'No file chosen';
-        fileNameElement.classList.remove('has-file');
-        
-      }
-  });
-
+  // =========================
+  // LOAD IMAGEM PADRÃO
+  // =========================
   img.src = defaultImageUrl;
   img.onload = () => {
     canvas.width = img.width;
@@ -55,8 +43,13 @@ function initEditor() {
     applyFilters();
   };
 
+  // =========================
+  // APLICA FILTROS + TRANSFORM
+  // =========================
   function applyFilters() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.save();
+
     ctx.filter = `
       brightness(${filters.brightness}%)
       contrast(${filters.contrast}%)
@@ -65,13 +58,29 @@ function initEditor() {
       blur(${filters.blur}px)
       invert(${filters.invert}%)
     `;
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+    ctx.translate(canvas.width / 2, canvas.height / 2);
+
+    if (flipY) {
+      ctx.scale(1, -1);
+    }
+
+    ctx.rotate((rotation * Math.PI) / 180);
+
+    ctx.drawImage(img, -img.width / 2, -img.height / 2);
+
+    ctx.restore();
   }
 
-  // 📥 Upload da imagem
+  // =========================
+  // UPLOAD DA IMAGEM
+  // =========================
   uploadImageInput.addEventListener('change', e => {
     const file = e.target.files[0];
     if (!file) return;
+
+    fileNameElement.textContent = file.name;
+    fileNameElement.classList.add('has-file');
 
     const reader = new FileReader();
     reader.onload = ev => {
@@ -80,44 +89,67 @@ function initEditor() {
     reader.readAsDataURL(file);
   });
 
-  // 🎚 Slider
+  // =========================
+  // SLIDER (BARRA DE INTENSIDADE)
+  // =========================
   slider.addEventListener('input', () => {
     filters[currentFilter] = slider.value;
     applyFilters();
   });
 
-  // 🎨 Botões de filtro
+  // =========================
+  // BOTÕES DE FILTRO
+  // =========================
   filterButtons.forEach(btn => {
-    btn.addEventListener('click', (e) => {
+    btn.addEventListener('click', e => {
       e.preventDefault();
+
       filterButtons.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
 
       currentFilter = btn.id;
       slider.value = filters[currentFilter];
+
+      if (currentFilter === 'blur') {
+        slider.max = 10;
+        slider.min = 0;
+      } else if (currentFilter === 'invert') {
+        slider.max = 100;
+        slider.min = 0;
+      } else {
+        slider.max = 200;
+        slider.min = 0;
+      }
     });
   });
-  
-  // Rotação e Inversão da Imagem
-  document.getElementById('rotate-left').addEventListener('click', (e) => {
+
+  // =========================
+  // ROTATE & FLIP
+  // =========================
+  rotateLeftBtn.addEventListener('click', e => {
     e.preventDefault();
-    rotateImage(-90);
+    rotation -= 90;
+    applyFilters();
   });
 
-  document.getElementById('rotate-right').addEventListener('click', (e) => {
+  rotateRightBtn.addEventListener('click', e => {
     e.preventDefault();
-    rotateImage(90);
+    rotation += 90;
+    applyFilters();
   });
 
-  document.getElementById('flip-vertical').addEventListener('click', (e) => {
+  flipVerticalBtn.addEventListener('click', e => {
     e.preventDefault();
-    flipImage();
+    flipY = !flipY;
+    applyFilters();
   });
 
-  // Limpar Filtros
-  document.getElementById('reset-filters').addEventListener('click', (e) => {
+  // =========================
+  // ♻ RESET
+  // =========================
+  resetFiltersBtn.addEventListener('click', e => {
     e.preventDefault();
-    // Restaurar os valores dos filtros
+
     filters = {
       brightness: 100,
       contrast: 100,
@@ -126,44 +158,37 @@ function initEditor() {
       blur: 0,
       invert: 0,
     };
-    applyFilters();
-    slider.value = 100; // Resetar o slider para 100%
 
-    // Desativar todos os botões de filtro
+    rotation = 0;
+    flipY = false;
+
+    slider.value = 100;
     filterButtons.forEach(btn => btn.classList.remove('active'));
+
+    applyFilters();
   });
 
-  // Funções de rotação e inversão
-  function rotateImage(degrees) {
-    const tempCanvas = document.createElement('canvas');
-    const tempCtx = tempCanvas.getContext('2d');
-
-    tempCanvas.width = canvas.height;
-    tempCanvas.height = canvas.width;
-
-    tempCtx.translate(tempCanvas.width / 2, tempCanvas.height / 2);
-    tempCtx.rotate((degrees * Math.PI) / 180);
-    tempCtx.drawImage(canvas, -canvas.width / 2, -canvas.height / 2);
-
-    canvas.width = tempCanvas.width;
-    canvas.height = tempCanvas.height;
-    ctx.drawImage(tempCanvas, 0, 0);
-    applyFilters();
-  }
-
-  function flipImage() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.translate(0, canvas.height);
-    ctx.scale(1, -1);
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    applyFilters();
-  }
-  // 💾 Salvar
-  saveBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    const link = document.createElement('a');
-    link.download = 'imagem-editada.png';
-    link.href = canvas.toDataURL();
-    link.click();
+  // =========================
+  // SALVAR IMAGEM
+  // =========================
+  saveBtn.addEventListener('click', () => {
+    try {
+      const dataURL = canvas.toDataURL('image/png');
+  
+      const a = document.createElement('a');
+      a.href = dataURL;
+      a.download = 'imagem-editada.png';
+  
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    } catch (err) {
+      alert('Não foi possível salvar a imagem.');
+      console.error(err);
+    }
   });
+  
 }
+
+//INICIALIZA
+document.addEventListener('DOMContentLoaded', initEditor);
