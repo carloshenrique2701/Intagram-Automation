@@ -1,0 +1,24 @@
+{
+  "name": "Instagram Post's Automation",
+  "version": "1.0.0",
+  "description": "System for automatic posts in Intagram",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "Carlos Henrique",
+  "liscense": "MI",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "body-parser": "^2.2.1",
+    "cors": "^2.8.6",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "googleapis": "^171.2.0",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.1.5",
+    "multer": "^2.0.2"
+  },
+  "keywords": [],
+  "type": "commonjs"
+}

@@ -1,0 +1,96 @@
+<div class="container">
+  <div class="folder">
+    <div class="front-side">
+      <div class="tip"></div>
+      <div class="cover"></div>
+    </div>
+    <div class="back-side cover"></div>
+  </div>
+  <label class="custom-file-upload">
+    <input class="title" id="upload-image" type="file" />
+    Choose a file
+  </label>
+  <div class="file-name" id="fileName">No file chosen</div>
+</div>
+
+<div class="editor-container">
+  <div class="canvas-container">
+    <canvas id="canvas"></canvas>
+  </div>
+
+  <div class="filter-control">
+    <input id="slider" type="range" min="0" max="200" value="100">
+  </div>
+
+  <!-- Controles Gerais -->
+  <div class="controls">
+    <button id="rotate-left" title="Girar à Esquerda">
+      <i class="fas fa-undo"></i>
+    </button>
+    <button id="rotate-right" title="Girar à Direita">
+      <i class="fas fa-redo"></i>
+    </button>
+    <button id="flip-vertical" title="Inverter Verticalmente">
+      <i class="fas fa-arrows-alt-v"></i>
+    </button>
+    <button id="reset-filters" title="Limpar Filtros">
+      <i class="fas fa-ban"></i>
+    </button>
+    <button id="select-image" title="Selecionar Nova Imagem">
+      <i class="fas fa-image"></i>
+    </button>
+    <button id="save" class="save-btn" title="Salvar Imagem">
+      <i class="fas fa-save"></i>
+    </button>
+  </div>
+
+  <!-- Botões de Filtros -->
+  <div class="filter-buttons">
+    <button id="brightness" class="filter-btn" title="Brilho">
+      <i class="fas fa-sun"></i>
+    </button>
+    <button id="contrast" class="filter-btn" title="Contraste">
+      <i class="fas fa-adjust"></i>
+    </button>
+    <button id="saturation" class="filter-btn" title="Saturação">
+      <i class="fas fa-tint"></i>
+    </button>
+    <button id="sepia" class="filter-btn" title="Sépia">
+      <i class="fas fa-fill-drip"></i>
+    </button>
+    <button id="blur" class="filter-btn" title="Desfoque">
+      <i class="fas fa-low-vision"></i>
+    </button>
+    <button id="invert" class="filter-btn" title="Negativo">
+      <i class="fas fa-exclamation-circle"></i>
+    </button>
+  </div>
+</div>
+
+<script>
+  //Mostra o nome do arquivo na input
+  document.getElementById('upload-image').addEventListener('change', function(e) {
+
+    const fileNameElement = document.getElementById('fileName');
+
+      if (this.files && this.files.length > 0) {
+
+        // Mostra apenas o nome do arquivo, não o caminho completo
+        const fileName = this.files[0].name;
+        fileNameElement.textContent = fileName;
+        fileNameElement.classList.add('has-file');
+
+      } else {
+
+        fileNameElement.textContent = 'No file chosen';
+        fileNameElement.classList.remove('has-file');
+        
+      }
+  });
+  
+</script>
+<script src="../js/editor.js"></script>
+<link rel="stylesheet" href="../css/editor.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+

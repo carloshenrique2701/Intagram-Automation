@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+    <head>
+        
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Faça seu Login - PostAtion</title>
+        <link rel="stylesheet" href="../css/global.css">
+        <link rel="stylesheet" href="../css/input-wrappers.css">
+        <link rel="stylesheet" href="../css/backAnimation.css">
+
+        <style>
+
+            body, html {
+
+                transition: all 0.2s ease-in-out;
+
+            }
+
+            main {
+
+                display: flex;
+
+            }
+
+            .left {
+
+                width: 80%;
+                animation: fade-in-left 1s ease-in-out;
+
+            }
+
+            .right {
+
+                width: 20%;
+                background-color: #f7f7f7;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+                animation: fade-in-right 1s ease-in-out;
+                z-index: 10000;
+
+            }
+
+            h1, .politics {
+
+                position: absolute;
+                z-index: 10000;
+                
+            }
+
+            h1 {
+
+                top: 50%;
+                left: 35%;
+                transform: translate(-50%, -50%);
+                text-shadow: 2px 4px 8px rgba(0, 0, 0, 0.3);
+                color: #111;
+                font-family: Impact, Haettenschweiler;
+                font-size: 5rem;
+
+            }
+
+            .politics {
+
+                bottom: 20px;
+                left: 35%;
+                transform: translate(-50%, -50%);
+
+            }
+
+            .politics a {
+
+                text-decoration: none;
+                color: #777;
+                transition: all 0.2s ease-in-out;
+
+            }
+
+            .politics a:hover {
+
+                text-decoration: underline;
+                color: #555;
+
+            }
+
+            form {
+
+                width: 100%;
+
+            }
+
+        </style>
+
+    </head>
+    <body>
+
+        <main>
+
+            <div class="left">
+                <h1>PostAtion</h1>
+
+                <small class="politics"><a href="#">Politicas e privacidade</a></small>
+
+                <div class="background">
+                    <span class="ball"></span>
+                    <span class="ball"></span>
+                    <span class="ball"></span>
+                    <span class="ball"></span>
+                    <span class="ball"></span>
+                    <span class="ball"></span>
+                </div>
+                
+            </div>
+
+            <div class="right">
+
+                <h2>Faça seu Login</h1>
+
+                <form id="formLogin">
+
+                    <div class="input-wrapper">
+
+                        <input type="email" name="loginEmail" id="loginEmail" placeholder="" required>
+                        <label for="loginEmail">Digite seu Email:</label>
+    
+                    </div>
+
+                    <div class="input-wrapper">
+
+                        <input type="password" name="loginPassword" id="loginPassword" placeholder="" required>
+                        <label for="loginPassword">Digite seu Senha:</label>
+    
+                    </div>
+
+                    <div class="btn-group">
+
+                        <a href="cadastro.html" class="back button">Cadastre-se</a>
+                        <button type="submit">Logar</button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </main>
+        
+        <script src="../js/login.js"></script>
+
+    </body>
+</html>
