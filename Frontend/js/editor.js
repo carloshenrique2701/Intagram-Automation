@@ -14,7 +14,7 @@ function initEditor() {
   const saveBtn = document.querySelector('#save');
 
   const defaultImageUrl =
-    'https://raw.githubusercontent.com/Ninja1375/Editor-de-Fotos-Responsivo/main/Logo%20editor%20de%20imagens%20.png';
+    '../imgs/img-default.jpeg';
 
   let img = new Image();
   let currentFilter = 'brightness';
@@ -27,6 +27,26 @@ function initEditor() {
     blur: 0,
     invert: 0,
   };
+
+  //Mostra o nome do arquivo na input
+  document.getElementById('upload-image').addEventListener('change', function(e) {
+
+    const fileNameElement = document.getElementById('fileName');
+
+      if (this.files && this.files.length > 0) {
+
+        // Mostra apenas o nome do arquivo, não o caminho completo
+        const fileName = this.files[0].name;
+        fileNameElement.textContent = fileName;
+        fileNameElement.classList.add('has-file');
+
+      } else {
+
+        fileNameElement.textContent = 'No file chosen';
+        fileNameElement.classList.remove('has-file');
+        
+      }
+  });
 
   img.src = defaultImageUrl;
   img.onload = () => {
