@@ -139,16 +139,12 @@ app.post('/cadastro', async (req, res) => {
             { expiresIn: '24h' }
         );
 
-        return res.status(201).json({ 
-            success: true,
-            message: 'Usuário cadastrado com sucesso!',
-            token,
-            user: {
-                id: user._id,
-                name: user.name,
-                email: user.email
-            }
-        });
+        const userResponse = {
+            id: user._id,
+            name: user.name,
+            email: user.email,
+            instagramEmail: user.instagramCredentials.email
+        };
 
     } catch (error) {
         console.error('Erro ao realizar cadastro:', error);
@@ -206,7 +202,8 @@ app.post('/login', async (req, res) => {
             user: { 
                 id: user._id,
                 name: user.name,
-                email: user.email
+                email: user.email,
+                instagramEmail: user.instagramCredentials.email
             }
         });
 
@@ -219,7 +216,7 @@ app.post('/login', async (req, res) => {
     }
 });
 
-// Dados Instagram (COM CRIPTOGRAFIA)
+// Dados Instagram
 app.put('/instagram-login', authenticateToken, async (req, res) => {
     try {
         const { instagramEmail, instagramPassword } = req.body;
@@ -240,25 +237,213 @@ app.put('/instagram-login', authenticateToken, async (req, res) => {
             });
         }
 
+        // Atualiza os dados do Instagram
         user.instagramCredentials = {
             email: instagramEmail,
-            password: instagramPassword 
+            password: instagramPassword
         };
 
         await user.save();
 
+        // Retorna o usuário atualizado (sem a senha do Instagram por segurança)
+        const userResponse = {
+            id: user._id,
+            name: user.name,
+            email: user.email,
+            instagramEmail: user.instagramCredentials.email
+        };
+
         return res.status(200).json({ 
             success: true,
-            message: 'Dados do Instagram atualizados com sucesso!' 
+            message: 'Dados do Instagram atualizados com sucesso!',
+            user: userResponse
         });
 
     } catch (error) {
         console.error('Erro ao atualizar dados do Instagram:', error);
         return res.status(500).json({ 
             success: false,
-            message: 'Erro no servidor.' 
+            message: 'Erro no servidor.'
         });
     }
+});
+
+//Rota para atualizar o email do usuário
+app.put('/update-user/email', authenticateToken, async (req, res) => {
+
+    try {
+
+        const { oldEmail, newEmail } = req.body;
+
+        if (!oldEmail) return res.status(400).json({
+            success: false,
+            message: 'É necessário o email antigo.'
+        });
+
+        if (!newEmail) return res.status(400).json({
+            success: false,
+            message: 'Email não encontrado'
+        });
+
+        const user = await User.findOne({ email: oldEmail.toLowerCase() });
+
+        if (!user) return res.status(404).json({
+            success: false,
+            message: 'Usuário não encontrado.'
+        });
+
+        user.email = newEmail.toLowerCase();
+
+        await user.save();
+
+        const userResponse = {
+            id: user._id,
+            name: user.name,
+            email: user.email,
+            instagramEmail: user.instagramCredentials.email
+        };
+
+        return res.status(200).json({ 
+            success: true,
+            message: 'Email atualizado com sucesso.',
+            user: userResponse
+        });
+
+    } catch (error) {
+        console.error('Erro ao alterar o email: ',error);
+        return res.status(500).json({ 
+            success: false,
+            message: 'Erro no servidor.'
+        });
+    }
+
+
+});
+
+//Rota para atualizar a senha do usuário
+app.put('/update-user/password', authenticateToken, async (req, res) => {
+
+    try {
+
+        const { email, newPassword } = req.body;
+
+        if (!email) return res.status(404).json({
+            success: false,
+            message: 'É necessário o email do usuário.'
+        });
+
+        if (!newPassword) return res.status(400).json({
+            success: false,
+            message: 'Senha não encontrada.'
+        });
+
+        if (newPassword.length < 6) {
+            return res.status(400).json({
+                success: false,
+                message: 'A senha deve ter pelo menos 6 caracteres'
+            });
+        }
+
+        const user = await User.findOne({ email: email.toLowerCase() });
+
+        if (!user) return res.status(404).json({
+            success: false,
+            message: 'Usuário não encontrado.'
+        });
+
+        user.password = newPassword;
+
+        await user.save();
+
+        const userResponse = {
+            id: user._id,
+            name: user.name,
+            email: user.email,
+            instagramEmail: user.instagramCredentials.email
+        };
+
+        return res.status(200).json({ 
+            success: true,
+            message: 'Senha alterado com sucesso!',
+            user: userResponse
+        });
+
+    } catch (error) {
+        console.error('Erro ao alterar a senha: ',error);
+        return res.status(500).json({ 
+            success: false,
+            message: 'Erro no servidor.'
+        });
+    }
+
+
+});
+
+app.post('/validate-password', authenticateToken, async (req, res) => {
+
+    try {
+
+        const { password, email } = req.body;
+
+        if (!password || password.length < 6) return res.status(400).json({ 
+            success: false, 
+            message: 'A senha inválida.' 
+        });
+
+        if (!email) return res.status(400).json({
+            success: false,
+            message: 'Erro ao procurar por usuário.'
+        })
+
+        const user = await User.findOne({ email });
+
+        if (!user) return res.status(404).json({
+            succes: false,
+            message: "Usuário não encontrado."
+        });
+
+        const isPasswordValid = await user.comparePassword(password);
+        
+        return res.status(200).json({
+            success: true,
+            isPasswordValid: isPasswordValid,
+        });
+
+    } catch (error) {
+        console.error('Erro ao verificar a senha do usuário: ', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Erro no servidor'
+        });
+    }
+
+});
+
+app.delete('/delete-account', authenticateToken, async (req, res) => {
+
+    try {
+
+        const { email } = req.body;
+
+        if (!email) return req.status(400).json({ success: false, message: 'Erro ao procurar usuário.' });
+
+        const userDeleted = await User.findOneAndDelete({ email });
+
+        if (!userDeleted) return req.status(404).json({ sucess: false, message: 'Usuário não encontrado.' }); 
+
+        return res.status(200).json({
+            success: true,
+            message: 'Sua conta foi deletada com sucesso!'
+        })
+
+    } catch (error) {
+        console.error('Erro ao deletar conta: ', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Erro ao deletar conta.'
+        })
+    }
+
 });
 
 // Rota de Upload

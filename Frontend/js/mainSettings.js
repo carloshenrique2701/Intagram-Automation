@@ -1,3 +1,5 @@
+
+//Verifica se hã algum usuário logado no localStorage
 document.addEventListener('DOMContentLoaded', function () {
    
     const userNameElement = document.getElementById('userName');
@@ -11,7 +13,11 @@ document.addEventListener('DOMContentLoaded', function () {
         window.location.href = 'login.html';
     }
 
+    console.log(user)
+
 });
+
+let user =  JSON.parse(localStorage.getItem('user'));
 
 //Botões das configurações
 const sectionChangeEmail = document.getElementById('changeEmail');
@@ -68,10 +74,11 @@ function closeAllModals() {
 
 function cleanAllInputs() {
     
-    const inputsModal = document.querySelectorAll('#inputModal');
+    const inputsModal = document.querySelectorAll('.inputModal');
 
     inputsModal.forEach(input => {
         input.textContent = '';
+        input.value = '';
     });
 
 }
@@ -91,6 +98,8 @@ settingsSections.forEach(sectionBtn => sectionBtn.addEventListener('click', () =
     closeAllModals();
     cleanAllInputs();
 
+    user =  JSON.parse(localStorage.getItem('user'));
+    
     switch (modal) {
         case modalChangeEmail.id:
             modalChangeEmail.style.display = 'flex';
@@ -106,6 +115,8 @@ settingsSections.forEach(sectionBtn => sectionBtn.addEventListener('click', () =
     
         case modalCredentialsInstagram.id:
             modalCredentialsInstagram.style.display = 'flex';
+            document.getElementById('instagramEmailOrNumber').value = user.instagramEmail || '';
+
             break;
     
         case modalDeleteAccont.id:
@@ -115,6 +126,7 @@ settingsSections.forEach(sectionBtn => sectionBtn.addEventListener('click', () =
             break;
     
         default:
+            console.log('Erro ao abrir um modal')
             break;
     }
 
@@ -129,8 +141,6 @@ btnLogout.addEventListener('click', () => {
     window.location.href = 'login.html';
 
 });
-
-const user =  JSON.parse(localStorage.getItem('user'));
 
 //Mudar email
 const confirmAlertChangeEmail = document.getElementById('confirm-alert-change-email');
@@ -153,7 +163,7 @@ formConfirmEmailChangePassword.addEventListener('submit', (e) => {
 
     e.preventDefault();
 
-    const emailConfirmtionInputChangePassword = document.getElementById('email-confirmation-change-password').value;
+    const emailConfirmtionInputChangePassword = document.getElementById('email-confirmation-change-email').value;
 
     if (user.email === emailConfirmtionInputChangePassword) {
         contentChangePassword[1].style.display = 'none';
@@ -178,6 +188,7 @@ confirmAlertDeleteAccont.addEventListener('click', () => {
 
 formCheckEmailDelete.addEventListener('submit', (e) => {
 
+    e.preventDefault();
     const emailConfirmtionInputDelete = document.getElementById('email-confirmation-delete').value;
     if (user.email === emailConfirmtionInputDelete) {
         contentDelete[1].style.display = 'none';

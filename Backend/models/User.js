@@ -17,14 +17,10 @@ const userSchema = new mongoose.Schema({
         type: String, 
         required: true 
     },
-    LoginInstagramEmailOrNumber: { 
-        type: String,
-        default: ''
+    instagramCredentials: {
+        email: { type: String, default: '' },
+        password: { type: String, default: '' }
     },
-    LoginInstagramPassword: { 
-        type: String,
-        default: ''
-    }
 }, { timestamps: true });
 
 // HASH da senha ANTES de salvar

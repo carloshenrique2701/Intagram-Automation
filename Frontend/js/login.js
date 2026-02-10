@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 localStorage.setItem('user', JSON.stringify(data.user));
                 
                 // Feedback visual
-                mostrarSucesso('Cadastro realizado com sucesso!');
+                mostrarSucesso('Login realizado com sucesso!');
                 
                 // Pequeno delay para mostrar mensagem
                 setTimeout(() => {
@@ -78,12 +78,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 }, 1000);
                 
             } else {
-                mostrarErro(data.message || 'Erro no cadastro');
+                mostrarErro(data.message || 'Erro no login');
                 btnSubmit.textContent = btnOriginalText;
             }
             
         } catch (error) {
-            console.error('Erro no cadastro:', error);
+            console.error('Erro no login:', error);
             mostrarErro('Erro de conexão. Tente novamente.');
             btnSubmit.textContent = btnOriginalText;
             btnSubmit.disabled = false;

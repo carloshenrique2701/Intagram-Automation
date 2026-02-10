@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Pequeno delay para mostrar mensagem
                 setTimeout(() => {
                     window.location.href = 'main.html';
-                }, 1500);
+                }, 1000);
                 
             } else {
                 mostrarErro(data.message || 'Erro no cadastro');

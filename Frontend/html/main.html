@@ -145,7 +145,7 @@
             #noPost {
 
                 position: absolute;
-                top: 50%;
+                top: 60%;
                 left: 50%;
                 transform: translate(-50%, -50%);
                 color: #888;
@@ -362,9 +362,9 @@
 
             <div class="modal-content" id="modal-content-alert-email">
 
-                <h2>Tem certeza que deseja mudar seu email?</h2>
+                <h2>Tem certeza que deseja alterar seu email?</h2>
                 <div class="btn-group">
-                    <button class="cancel">Cancelar</button>
+                    <button type="button" class="cancel">Cancelar</button>
                     <button id="confirm-alert-change-email">Confirmar</button>
                 </div>
 
@@ -374,9 +374,9 @@
 
                 <h2>Digite o novo email:</h2>
                 <form id="putEmailForm">
-                    <input type="text" id="new-email inputModal">
+                    <input type="text" id="new-email" class="inputModal">
                     <div class="btn-group">
-                        <button class="cancel">Cancelar</button>
+                        <button type="button" class="cancel">Cancelar</button>
                         <button type="submit">Confirmar</button>    
                     </div>
                 </form>
@@ -391,7 +391,7 @@
 
                 <h2>Tem certeza que deseja mudar sua senha?</h2>
                 <div class="btn-group">
-                    <button class="cancel">Cancelar</button>
+                    <button type="button" class="cancel">Cancelar</button>
                     <button id="confirmAlertChangePassword">Confirmar</button>
                 </div>
 
@@ -400,9 +400,9 @@
 
                 <h2>Digite seu email para confirmação:</h2>
                 <form id="formConfirmEmailChangePassword">
-                    <input type="text" id="email-confirmation-change-email inputModal">
+                    <input type="text" id="email-confirmation-change-email" class="inputModal">
                     <div class="btn-group">
-                        <button class="cancel">Cancelar</button>
+                        <button type="button" class="cancel">Cancelar</button>
                         <button type="submit">Confirmar</button>
                     </div>
                 </form>
@@ -413,9 +413,9 @@
 
                 <h2>Digite a nova senha:</h2>
                 <form id="putPasswordForm">
-                    <input type="text" id="new-password inputModal">
+                    <input type="text" id="new-password" class="inputModal">
                     <div class="btn-group">
-                        <button class="cancel">Cancelar</button>
+                        <button type="button" class="cancel">Cancelar</button>
                         <button type="submit">Confirmar</button>
                     </div>
                 </form>
@@ -435,20 +435,20 @@
 
                     <div class="input-wrapper">
 
-                        <input type="text" id="instagramEmailOrNumber inputModal" required placeholder="">
+                        <input type="email" id="instagramEmailOrNumber" class="inputModal" required placeholder="">
                         <label for="instagramEmailOrNumber">Digite o seu email ou numero de telefone:</label>
 
                     </div>
 
                     <div class="input-wrapper">
 
-                        <input type="text" id="instagramPassword inputModal" required placeholder="">
+                        <input type="password" id="instagramPassword" class="inputModal" required placeholder="">
                         <label for="instagramPassword">Digite sua senha:</label>
 
                     </div>
 
                     <div class="btn-group">
-                        <button class="cancel">Cancelar</button>
+                        <button type="button" class="cancel">Cancelar</button>
                         <button type="submit">Salvar</button>
                     </div>
 
@@ -464,7 +464,7 @@
 
                 <h2>Tem certeza que deseja excluir sua conta?</h2>
                 <div class="btn-group">
-                    <button class="cancel">Cancelar</button>
+                    <button type="button" class="cancel">Cancelar</button>
                     <button id="confirmAlertDeleteAccont">Confirmar</button>
                 </div>
 
@@ -473,9 +473,9 @@
 
                 <h2>Digite seu email para confirmação:</h2>
                 <form id="formCheckEmailDelete">
-                    <input type="text" id="email-confirmation-delete inputModal">
+                    <input type="text" id="email-confirmation-delete" class="inputModal">
                     <div class="btn-group">
-                        <button class="cancel">Cancelar</button>
+                        <button type="button" class="cancel">Cancelar</button>
                         <button type="submit">Confirmar</button>
                     </div>
                 </form>
@@ -486,10 +486,10 @@
 
                 <h2>Digite sua senha para confirmação:</h2>
                 <form id="deleteAccontForm">
-                    <input type="text" id="password-confirmation inputModal">
+                    <input type="password" id="password-confirmation" class="inputModal">
                     <div class="btn-group">
-                        <button class="cancel">Cancelar</button>
-                        <button type="submit">Confirmar</button>
+                        <button type="button" class="cancel">Cancelar</button>
+                        <button type="submit">Deletar</button>
                     </div>
                 </form>
 
@@ -551,6 +551,7 @@
         </script>
         <script src="../js/mainSettings.js"></script>
         <script src="../js/editor.js"></script>
+        <script type="module" src="../js/allFormsMain.js"></script>
 
     </body>
 </html>
