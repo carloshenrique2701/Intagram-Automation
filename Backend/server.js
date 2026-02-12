@@ -8,6 +8,7 @@ const { google } = require('googleapis');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const app = express();
+const authorize = require('./Auth/driveAutheAuth');
 
 // Configurações iniciais
 const JWT_SECRET = process.env.JWT_SECRET || require('crypto').randomBytes(64).toString('hex');
@@ -21,12 +22,33 @@ const User = require('./models/User');
 const Post = require('./models/Post');
 
 // Configuração do Google Drive
-const auth = new google.auth.GoogleAuth({
-    keyFile: 'credentials.json',
-    scopes: ['https://www.googleapis.com/auth/drive.file']
-});
+const oAuth2Client = authorize();
+const drive = google.drive({ version: 'v3', auth: oAuth2Client });
 
-const drive = google.drive({ version: 'v3', auth });
+// middleware para limpeza de arquivos temporários
+const cleanupTempFiles = () => {
+    const tempDir = 'uploads/';
+    if (!fs.existsSync(tempDir)) return;
+    
+    const files = fs.readdirSync(tempDir);
+    const now = Date.now();
+    
+    files.forEach(file => {
+        const filePath = path.join(tempDir, file);
+        const stats = fs.statSync(filePath);
+        const fileAge = now - stats.mtimeMs;
+        
+        // Deletar arquivos com mais de 1 hora
+        if (fileAge > 3600000) {
+            fs.unlinkSync(filePath);
+            console.log(`Arquivo temporário deletado: ${file}`);
+        }
+    });
+};
+
+// Executar a cada hora
+setInterval(cleanupTempFiles, 3600000);
+
 
 // Configuração do Multer
 const storage = multer.diskStorage({
@@ -145,6 +167,18 @@ app.post('/cadastro', async (req, res) => {
             email: user.email,
             instagramEmail: user.instagramCredentials.email
         };
+
+        return res.status(200).json({ 
+            success: true,
+            message: 'Cadastro realizado com sucesso!',
+            token,
+            user: { 
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                instagramEmail: user.instagramCredentials.email
+            }
+        });
 
     } catch (error) {
         console.error('Erro ao realizar cadastro:', error);
@@ -450,12 +484,19 @@ app.delete('/delete-account', authenticateToken, async (req, res) => {
 app.post('/api/upload', authenticateToken, upload.single('image'), async (req, res) => {
     try {
         // Validação dos campos do formulário
-        const { description, datePost } = req.body;
+        const { postName, description, datePost } = req.body;
 
-        if (!description || !datePost) {
+        if (!postName || postName.length < 3 || postName.length > 30) {
+            return res.status(400).json({
+                success: false,
+                message: 'O nome do post deve ter entre 3 e 30 caracteres'
+            });
+        }
+
+        if (!datePost) {
             return res.status(400).json({ 
                 success: false,
-                message: 'Descrição e data do post são obrigatórios.' 
+                message: 'A data e hora do post são obrigatórios.' 
             });
         }
 
@@ -486,15 +527,29 @@ app.post('/api/upload', authenticateToken, upload.single('image'), async (req, r
             body: fs.createReadStream(req.file.path)
         };
         
-        const driveResponse = await drive.files.create({
-            resource: fileMetadata,
-            media: media,
-            fields: 'id, webViewLink, webContentLink'
-        });
+        let driveResponse;
+        try {
+            driveResponse = await drive.files.create({
+                resource: fileMetadata,
+                media: media,
+                fields: 'id, webViewLink, webContentLink'
+            });
+        } catch (driveError) {
+            console.error('Erro no Google Drive:', driveError);
+            // Limpar arquivo temporário
+            if (req.file && fs.existsSync(req.file.path)) {
+                fs.unlinkSync(req.file.path);
+            }
+            return res.status(500).json({
+                success: false,
+                message: 'Erro ao fazer upload para o Google Drive'
+            });
+        }
 
         // Criar post no banco de dados
         const newPost = new Post({
             userId: req.user.userId,
+            postName: postName,
             description: description,
             datePost: postDate,
             imageUrl: driveResponse.data.webViewLink,
@@ -506,16 +561,9 @@ app.post('/api/upload', authenticateToken, upload.single('image'), async (req, r
         // Limpar arquivo temporário
         fs.unlinkSync(req.file.path);
         
-        res.status(201).json({
+        return res.status(201).json({
             success: true,
-            message: 'Post criado com sucesso!',
-            post: {
-                id: newPost._id,
-                description: newPost.description,
-                datePost: newPost.datePost,
-                imageUrl: newPost.imageUrl,
-                createdAt: newPost.createdAt
-            }
+            message: 'Post criado com sucesso!' //Não precisa retornar os posts, estamos usando uma rota específica para listar todos
         });
         
     } catch (error) {
@@ -526,7 +574,7 @@ app.post('/api/upload', authenticateToken, upload.single('image'), async (req, r
             fs.unlinkSync(req.file.path);
         }
         
-        res.status(500).json({ 
+        return res.status(500).json({ 
             success: false, 
             message: 'Erro ao processar upload' 
         });

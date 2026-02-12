@@ -7,11 +7,17 @@ const postSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
-    description: {
+    postName: {
         type: String,
         required: true,
         trim: true,
-        maxlength: 2000
+        maxlength: 30
+    },
+    description: {
+        type: String,
+        trim: true,
+        maxlength: 2000,
+        dafault: ''
     },
     datePost: {
         type: Date,

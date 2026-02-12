@@ -1,0 +1,12 @@
+# Dependências
+node_modules/
+
+# Tokens e credenciais
+token.json
+client_secret.json
+.env
+
+# Uploads temporários
+uploads/
+tmp/
+

@@ -20,14 +20,16 @@ function initEditor() {
 
   let img = new Image();
   let currentFilter = 'brightness';
+  filterButtons.forEach(b => b.id === 'brightness' ? b.classList.add('active') : b.classList.remove('active'))
 
+  //Filtros padrões
   let filters = {
-    brightness: 100,
-    contrast: 100,
-    saturation: 100,
-    sepia: 0,
-    blur: 0,
-    invert: 0,
+    brightness: 100, //Brilho
+    contrast: 100, //Contraste
+    saturation: 100, //Saturação
+    sepia: 0, //Sépia (filtro de cor/tonalidade)
+    blur: 0, //Opacidade
+    invert: 0, //Inversão de cores
   };
 
   let rotation = 0;
@@ -38,6 +40,7 @@ function initEditor() {
   // =========================
   img.src = defaultImageUrl;
   img.onload = () => {
+    
     canvas.width = img.width;
     canvas.height = img.height;
     applyFilters();
@@ -81,6 +84,16 @@ function initEditor() {
 
     fileNameElement.textContent = file.name;
     fileNameElement.classList.add('has-file');
+
+    //Reseta os filtros ao carregar uma nova imagem
+    filters = {
+      brightness: 100, 
+      contrast: 100, 
+      saturation: 100, 
+      sepia: 0, 
+      blur: 0, 
+      invert: 0, 
+    };
 
     const reader = new FileReader();
     reader.onload = ev => {
@@ -163,7 +176,8 @@ function initEditor() {
     flipY = false;
 
     slider.value = 100;
-    filterButtons.forEach(btn => btn.classList.remove('active'));
+    filterButtons.forEach(b => b.id === 'brightness' ? b.classList.add('active') : b.classList.remove('active'))
+    currentFilter = 'brightness';
 
     applyFilters();
   });

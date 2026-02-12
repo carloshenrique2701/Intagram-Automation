@@ -4,7 +4,8 @@
   "description": "System for automatic posts in Intagram",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node Backend/server.js",
+    "dev": "nodemon Backend/server.js"
   },
   "author": "Carlos Henrique",
   "liscense": "MI",
@@ -14,10 +15,14 @@
     "cors": "^2.8.6",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
-    "googleapis": "^171.2.0",
+    "googleapis": "^171.4.0",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.1.5",
-    "multer": "^2.0.2"
+    "multer": "^2.0.2",
+    "open": "^11.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
   },
   "keywords": [],
   "type": "commonjs"

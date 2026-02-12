@@ -68,13 +68,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 
             } else {
                 mostrarErro(data.message || 'Erro no cadastro');
-                btnSubmit.textContent = btnOriginalText;
-                btnSubmit.disabled = false;
             }
             
         } catch (error) {
             console.error('Erro no cadastro:', error);
             mostrarErro('Erro de conexão. Tente novamente.');
+            
+        } finally {
             btnSubmit.textContent = btnOriginalText;
             btnSubmit.disabled = false;
         }

@@ -1,3 +1,4 @@
+//Form para adicionar as senhas do instagram
 const credentialsInstagramForm = document.getElementById('instagramCredentialsForm')
 
 credentialsInstagramForm.addEventListener('submit', async (e) => {
@@ -70,7 +71,7 @@ credentialsInstagramForm.addEventListener('submit', async (e) => {
 
 
 
-//Atualizar email
+//Form para atualizar email
 const changeEmailForm = document.getElementById('putEmailForm');
 
 changeEmailForm.addEventListener('submit', async (e) => {
@@ -150,7 +151,7 @@ changeEmailForm.addEventListener('submit', async (e) => {
 
 
 
-//Atualizar senha
+//Form para atualizar senha
 const putPasswordForm = document.getElementById('putPasswordForm');
 
 putPasswordForm.addEventListener('submit', async (e) => {
@@ -218,7 +219,7 @@ putPasswordForm.addEventListener('submit', async (e) => {
 
 
 
-
+//Form para deletar a conta
 const deleteAccontForm = document.getElementById('deleteAccontForm');
 
 deleteAccontForm.addEventListener('submit', async (e) => {
@@ -303,6 +304,117 @@ deleteAccontForm.addEventListener('submit', async (e) => {
 
 });
 
+
+
+
+const formUploadPost = document.getElementById('newPostForm');
+
+formUploadPost.addEventListener('submit', async (e) => {
+
+    e.preventDefault();
+
+    const canvas = document.querySelector('#canvas');
+    const postName = document.getElementById('postName').value;
+    const description = document.getElementById('postDescription').value;
+    const date = document.getElementById('datePost').value;
+    const time = document.getElementById('timePost').value;
+    const btnSubmit = e.target.querySelector("button[type='submit']");
+
+    const datePost = new Date(`${date}T${time}`);
+    const user = JSON.parse(localStorage.getItem('user'));
+    const token = localStorage.getItem('token');
+
+    //Verificações
+    
+    if (!user || !token) {
+        mostrarErro('Você precisa estar logado!', formUploadPost);
+        window.location.href = 'login.html';
+        return;
+    }
+    if (!postName) return mostrarErro('O post precisa ter um nome!', formUploadPost);
+    if (!canvas.toDataURL('image/png')) return mostrarErro('O post precisa ter um arquivo de imagem válido!', formUploadPost);
+    if (!user.instagramEmail) return mostrarErro('Você precisa estar com suas credenciais do instagram cadastradas! Vá para janela principal e cadastre-as!', formUploadPost);
+    
+    // Verificar se canvas tem imagem
+    try {
+        const hasImage = await new Promise((resolve) => {
+            canvas.toBlob((blob) => {
+                resolve(blob !== null);
+            }, 'image/png');
+        });
+        
+        if (!hasImage) {
+            return mostrarErro('O post precisa ter uma imagem válida!', formUploadPost);
+        }
+    } catch (error) {
+        console.error('Erro ao verificar canvas:', error);
+        return mostrarErro('Erro ao processar imagem!', formUploadPost);
+    }
+
+    btnSubmit.textContent = 'Salvando post...';
+    btnSubmit.disabled = true;
+
+    try {
+        
+        // Converter canvas para blob
+        const blob = await new Promise((resolve) => {
+            canvas.toBlob(resolve, 'image/png');
+        });
+
+        const formData = new FormData();
+        formData.append('image', blob, `post-${Date.now()}.png`);
+        formData.append('postName', postName);
+        formData.append('description', description || ''); 
+        formData.append('datePost', datePost.toISOString());
+
+        const resp = await fetch('http://127.0.0.1:3000/api/upload', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+            body: formData
+        });
+
+        if (!resp.ok) {
+            const text = await resp.text();
+            throw new Error(`Erro HTTP: ${resp.status} - ${text}`);
+        }
+
+        const data = await resp.json();
+
+        if (data.success) {
+            mostrarSucesso('Post salvo com sucesso!', formUploadPost);
+            
+            // Limpar formulário
+            document.getElementById('postName').value = '';
+            document.getElementById('postDescription').value = '';
+            
+            // Recarregar lista de posts
+            if (typeof listPosts === 'function') {
+                await listPosts();
+            }
+            
+            setTimeout(() => {
+                closeAllModals();
+            }, 1500);
+
+        } else {
+            mostrarErro(data.message || 'Erro ao salvar post. Tente novamente.', formUploadPost);
+        }
+
+    } catch (error) {
+        console.error('Erro no servidor: ', error);
+        mostrarErro('Ocorreu um erro ao salvar seu post. Tente novamente mais tarde.', formUploadPost);
+    } finally {
+        btnSubmit.textContent = 'Salvar Post';
+        btnSubmit.disabled = false;
+    }
+
+});
+
+async function listPosts() {
+    console.log('em produção...')
+}
 
 
 //Funções extras
