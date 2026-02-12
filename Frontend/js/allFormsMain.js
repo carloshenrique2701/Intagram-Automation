@@ -54,6 +54,8 @@ credentialsInstagramForm.addEventListener('submit', async (e) => {
                 closeAllModals();
             }, 1500);
             
+            window.location.reload;
+
         } else {
             mostrarErro(data.message || 'Erro ao salvar credenciais.', credentialsInstagramForm);
         }
@@ -325,7 +327,6 @@ formUploadPost.addEventListener('submit', async (e) => {
     const token = localStorage.getItem('token');
 
     //Verificações
-    
     if (!user || !token) {
         mostrarErro('Você precisa estar logado!', formUploadPost);
         window.location.href = 'login.html';

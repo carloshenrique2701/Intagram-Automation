@@ -8,7 +8,7 @@ const { google } = require('googleapis');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const app = express();
-const authorize = require('./Auth/driveAutheAuth');
+const authorize = require('./Auth/driveAuth');
 
 // Configurações iniciais
 const JWT_SECRET = process.env.JWT_SECRET || require('crypto').randomBytes(64).toString('hex');
@@ -413,6 +413,7 @@ app.put('/update-user/password', authenticateToken, async (req, res) => {
 
 });
 
+//Validação de senha para exclusão da conta
 app.post('/validate-password', authenticateToken, async (req, res) => {
 
     try {
@@ -453,6 +454,7 @@ app.post('/validate-password', authenticateToken, async (req, res) => {
 
 });
 
+//Excluir usuário
 app.delete('/delete-account', authenticateToken, async (req, res) => {
 
     try {
@@ -476,6 +478,49 @@ app.delete('/delete-account', authenticateToken, async (req, res) => {
             success: false,
             message: 'Erro ao deletar conta.'
         })
+    }
+
+});
+
+//Rota para verificar se o usuário já cadastrou suas credenciais do instagram
+app.post('/check-credentials', authenticateToken, async (req,res) => {
+
+    try {
+
+        const { email } = req.body;
+
+        if (!email) return res.status(400).json({
+            success: false,
+            message: 'É necessário estar logado!'
+        });
+
+        const user = await User.findOne({ email });
+
+        if (!user) return res.status(404).json({
+            success: false,
+            message: 'Usuário não encontrado.'
+        });
+
+        if (user.instagramCredentials.email && user.instagramCredentials.password){
+            return res.status(200).json({
+                success: true,
+                message: 'Credenciais cadastradas.',
+                credentials: true
+            });
+        } else {
+            return res.status(200).json({
+                success: true,
+                message: 'Credenciais não cadastradas.',
+                credentials: false
+            })
+        }
+
+    } catch(error) {
+        console.error('Erro ao checar credenciais: ', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Erro ao checar credenciais do instagram.'
+        });
     }
 
 });
